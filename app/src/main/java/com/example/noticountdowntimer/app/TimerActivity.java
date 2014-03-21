@@ -1,9 +1,11 @@
 package com.example.noticountdowntimer.app;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -20,7 +22,7 @@ import android.widget.TextView;
 public class TimerActivity extends ActionBarActivity {
     private final int mId = 1;
     private long[] mVibratePattern = {0, 200, 200, 300};
-    private Uri soundURI = Uri.parse("content://com.android.alarmclock/alarm");
+    private Uri soundURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
     private EditText time;
     private TextView showTime;
     private Button start_but;
@@ -40,18 +42,22 @@ public class TimerActivity extends ActionBarActivity {
         showTime = (TextView) findViewById(R.id.showTime);
         start_but = (Button) findViewById(R.id.count_but);
         stop_but = (Button) findViewById(R.id.stop_but);
-        mBuilder = new NotificationCompat.Builder(this).
-                setSmallIcon(android.R.drawable.ic_dialog_alert).setContentTitle("Noti title")
+
+        mNotificationIntent = new Intent(TimerActivity.this, TimerActivity.class);
+        mContentIntent = PendingIntent
+                .getActivity(TimerActivity.this, 0, mNotificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        mBuilder = new NotificationCompat.Builder(getApplicationContext()).
+                setSmallIcon(android.R.drawable.ic_dialog_alert)
+                .setContentTitle("Noti title")
                 .setContentText("ContentText")
-        .setVibrate(mVibratePattern)
-        .setSound(soundURI)
-        .setContentIntent(mContentIntent);
+                .setVibrate(mVibratePattern)
+                .setSound(soundURI)
+                .setContentIntent(mContentIntent);
         mNotificationManager = (NotificationManager) getSystemService
                 (Context.NOTIFICATION_SERVICE);
-
-        mNotificationIntent = new Intent(getApplicationContext(), TimerActivity.class);
-        mContentIntent = PendingIntent
-                .getActivity(getApplicationContext(), 0, mNotificationIntent, Intent.FLAG_ACTIVITY_NEW_TASK);
+        //remove after click
+        mBuilder.setAutoCancel(true);
 
         start_but.setOnClickListener(new View.OnClickListener() {
             @Override
